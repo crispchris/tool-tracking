@@ -232,7 +232,7 @@ def filter_ts_data(X, y=None, filt=None):
         X = X[idx]
 
         if y is not None:
-            y = np.array(y)[idx].tolist()
+            y = [y[i] for i in idx if i < len(y)]
 
     if not isinstance(X, TS_Data):
         return X, None, y
