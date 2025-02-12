@@ -162,7 +162,8 @@ class DiscreteAnnotation:
             data_full = data
 
         new_data = pd.DataFrame(data=data_full, columns=self._columns)
-        self._data = self._data.append(new_data, ignore_index=True)
+        self._data = pd.concat([self._data, new_data], ignore_index=True)
+        # self._data = self._data.append(new_data, ignore_index=True)
 
     def add_annotations_from_prediction(self, y: np.ndarray, t: np.ndarray):
         """
