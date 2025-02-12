@@ -1,6 +1,8 @@
-# Tool Tracking Dataset - Supplement Code
+# Tool Tracking Dataset
 
-In order to get things running:
+Dataset description: https://cmutschler.de/datasets/tool-tracking-dataset 
+
+## In order to get things running:
 
 1. Clone the repository
 
@@ -32,8 +34,8 @@ Start [Jupyter](https://jupyter.org/) and run the both notebook `How-to-load-the
 ```
 jupyter lab
 ```
+## Changelog
 
-Changelog:
 - 2025-02-12: Fix deprecated functions (pd.append, np.object, np.array non-homogeneity); Update dataset link (mirror)
 - 2020-08-31: Add <a href="https://htmlpreview.github.io/?https://github.com/mutschcr/tool-tracking/blob/master/html/index.html">HTML API-docs</a> and user guide
 - 2020-08-14: Update dataset with enhanced rivetter labels
@@ -43,5 +45,6 @@ Changelog:
 Known issues:
 - 2020-08-12: Enforcing window lenghts when segmenting rivetter data lets two very short windows (label -1) slip through. These cause problems and need to be filtered out: 'filter_labels(..)'
 
-License:
+## License
+
 <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.
