@@ -17,7 +17,13 @@ from seglearn.base import TS_Data
 from sklearn.utils.validation import check_array, check_is_fitted
 
 n_digits_unix_in_seconds = 10
-contextual_recarray_dtype = [('cls', np.object), ('sr', float), ('id', int), ('desc', np.object), ('height', float)]
+contextual_recarray_dtype = [
+    ("cls", object),
+    ("sr", float),
+    ("id", int),
+    ("desc", object),
+    ("height", float),
+]
 
 # create logger
 logger = logging.getLogger("transformer")
