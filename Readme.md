@@ -5,19 +5,23 @@ In order to get things running:
 1. Clone the repository
 
 ```
-git clone https://github.com/mutschcr/tool-tracking.git
+git clone https://github.com/crispchris/tool-tracking.git
+# forked from mutschcr/tool-tracking.git
 cd tool-tracking
 ```
 
 2. Then you need to download the measurement data from an external host:
 ```
-wget https://owncloud.fraunhofer.de/index.php/s/MQUpf2vhIghAtke/download -O tool-tracking-data.zip
+# updated link to mirror (Feb. 12, 2025)
+wget https://christofferloeffler.com/tooltracking/tool-tracking-data.zip -O tool-tracking-data.zip
 unzip tool-tracking-data.zip && rm tool-tracking-data.zip
+
+# deprecated link: wget https://owncloud.fraunhofer.de/index.php/s/MQUpf2vhIghAtke/download -O tool-tracking-data.zip
 ```
 
 3. Setup a virtual python environment (e.g. with [conda](https://www.anaconda.com/))
 ```
-conda create --name tool-tracking_env python=3.7
+conda create --name tool-tracking_env python=3.12
 conda activate tool-tracking_env
 pip install -r requirements.txt
 ```
@@ -26,10 +30,11 @@ pip install -r requirements.txt
 
 Start [Jupyter](https://jupyter.org/) and run the both notebook `How-to-load-the-data.ipynb` and `plot_window_sizes.ipynb` with:
 ```
-jupyter notebook
+jupyter lab
 ```
 
 Changelog:
+- 2025-02-12: Fix deprecated functions (pd.append, np.object, np.array non-homogeneity); Update dataset link (mirror)
 - 2020-08-31: Add <a href="https://htmlpreview.github.io/?https://github.com/mutschcr/tool-tracking/blob/master/html/index.html">HTML API-docs</a> and user guide
 - 2020-08-14: Update dataset with enhanced rivetter labels
 - 2020-08-12: Update dataset with twice the amount of labeled data; enhanced labels.
