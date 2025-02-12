@@ -27,6 +27,7 @@ class Item:
         Color associated with this item.
 
     """
+
     def __init__(self, class_name: str, label: int, color: str = None):
         self.class_name = class_name
         self.label = label
@@ -67,21 +68,45 @@ class DiscreteAnnotation:
         Name of the person which created this annotation file.
 
     """
+
     _header_file_extension = ".annotation"  # = xml
     _data_file_extension = ".annotation~"  # = csv
-    _columns = ("beginning of a segment in seconds", "end of a segment in seconds", "label id", "confidence value")
+    _columns = (
+        "beginning of a segment in seconds",
+        "end of a segment in seconds",
+        "label id",
+        "confidence value",
+    )
     _version = "3"
     _csv_delimiter = ";"
     # define colors (first color is grey, then the default matplotlib colors are used)
-    _colors = ['#FFD3D3D3', '#FF1F77B4', '#FFFF7F0E', '#FF2CA02C', '#FFD62728', '#FF9467BD', '#FF8C564B', '#FFE377C2',
-               '#FF7F7F7F', '#FFBCBD22', '#FF17BECF']
+    _colors = [
+        "#FFD3D3D3",
+        "#FF1F77B4",
+        "#FFFF7F0E",
+        "#FF2CA02C",
+        "#FFD62728",
+        "#FF9467BD",
+        "#FF8C564B",
+        "#FFE377C2",
+        "#FF7F7F7F",
+        "#FFBCBD22",
+        "#FF17BECF",
+    ]
 
-    def __init__(self, scheme_name: str, label_mapping: Dict[int, str], annotator: str = "Annotator"):
+    def __init__(
+        self,
+        scheme_name: str,
+        label_mapping: Dict[int, str],
+        annotator: str = "Annotator",
+    ):
         self._scheme_name: str = scheme_name
         self._annotator = annotator
 
-        self._items: Set[Item] = {Item(class_name, label, self._colors[color_id])
-                                  for color_id, (label, class_name) in enumerate(label_mapping.items())}
+        self._items: Set[Item] = {
+            Item(class_name, label, self._colors[color_id])
+            for color_id, (label, class_name) in enumerate(label_mapping.items())
+        }
 
         self._data: pd.DataFrame = pd.DataFrame(columns=self._columns)
 
@@ -139,7 +164,9 @@ class DiscreteAnnotation:
 
         return self
 
-    def add_annotation(self, row: Union[Tuple[float, float, int], Tuple[float, float, int, float]]):
+    def add_annotation(
+        self, row: Union[Tuple[float, float, int], Tuple[float, float, int, float]]
+    ):
         """
         Add a new annotated segment. Passing the confidence (default=1) is optional.
         """
@@ -186,7 +213,9 @@ class DiscreteAnnotation:
         # DATA FILE
         self._data["label id"] = self._data["label id"].astype(int)
 
-        self._data.to_csv(output.with_suffix(".annotation~"), sep=";", header=False, index=False)
+        self._data.to_csv(
+            output.with_suffix(".annotation~"), sep=";", header=False, index=False
+        )
 
     @classmethod
     @convert2path
@@ -206,30 +235,45 @@ class DiscreteAnnotation:
         """
 
         # check for correct file extension
-        if filepath.suffix != cls._header_file_extension and str(filepath) != cls._header_file_extension:
+        if (
+            filepath.suffix != cls._header_file_extension
+            and str(filepath) != cls._header_file_extension
+        ):
             raise TypeError("Select a valid annotation file.")
 
         # reading segments from data file
         try:
-            data = np.loadtxt(fname=str(filepath.with_suffix(cls._data_file_extension)),
-                              delimiter=cls._csv_delimiter)
+            data = np.loadtxt(
+                fname=str(filepath.with_suffix(cls._data_file_extension)),
+                delimiter=cls._csv_delimiter,
+            )
         except OSError:
-            print(f"Missing annotation data: {filepath.with_suffix(cls._data_file_extension)}", 'error')
+            print(
+                f"Missing annotation data: {filepath.with_suffix(cls._data_file_extension)}",
+                "error",
+            )
             return None
 
         # parse xml annotation file
         tree = xml.etree.ElementTree.parse(filepath)
         root = tree.getroot()
 
-        scheme = [child for child in root if child.tag == 'scheme'][0]
-        meta = [child for child in root if child.tag == 'meta'][0]
+        scheme = [child for child in root if child.tag == "scheme"][0]
+        meta = [child for child in root if child.tag == "meta"][0]
 
-        if scheme.attrib['type'] != 'DISCRETE':
-            raise TypeError(f"Annotation scheme is no DISCRETE but {scheme.attrib['type']}.")
+        if scheme.attrib["type"] != "DISCRETE":
+            raise TypeError(
+                f"Annotation scheme is no DISCRETE but {scheme.attrib['type']}."
+            )
 
-        annotation = cls(scheme.attrib['name'], {}, meta.attrib['annotator'])
+        annotation = cls(scheme.attrib["name"], {}, meta.attrib["annotator"])
         annotation._items = {
-            Item(item.attrib['name'], int(item.attrib['id']), item.attrib.get('color', None)) for item in scheme
+            Item(
+                item.attrib["name"],
+                int(item.attrib["id"]),
+                item.attrib.get("color", None),
+            )
+            for item in scheme
         }
 
         annotation.add_annotations(data)
@@ -243,15 +287,32 @@ class DiscreteAnnotation:
         Create a string representation of the xml header file.
         """
         header = ElementTree.Element("annotation", attrib={"ssi-v": self._version})
-        _ = ElementTree.SubElement(header, "info", attrib={"ftype": "ASCII", "size": "71"})
-        _ = ElementTree.SubElement(header, "meta", attrib={"annotator": self._annotator})
+        _ = ElementTree.SubElement(
+            header, "info", attrib={"ftype": "ASCII", "size": "71"}
+        )
+        _ = ElementTree.SubElement(
+            header, "meta", attrib={"annotator": self._annotator}
+        )
         scheme = ElementTree.SubElement(
-            header, "scheme", attrib={"name": self._scheme_name, "type": "DISCRETE", "color": "#FFFFFFFF"}
+            header,
+            "scheme",
+            attrib={
+                "name": self._scheme_name,
+                "type": "DISCRETE",
+                "color": "#FFFFFFFF",
+            },
         )
 
         for item in sorted(self._items, key=lambda item_: item_.label):
-            ElementTree.SubElement(scheme, "item", attrib={
-                "name": item.class_name, "id": str(item.label), "color": item.color})
+            ElementTree.SubElement(
+                scheme,
+                "item",
+                attrib={
+                    "name": item.class_name,
+                    "id": str(item.label),
+                    "color": item.color,
+                },
+            )
 
         dom = xml.dom.minidom.parseString(ElementTree.tostring(header))
 
@@ -276,14 +337,13 @@ class DiscreteAnnotation:
         """
 
         lims = list(np.where(np.diff(y) != 0)[0] + 1)
-        lims = [0] + lims + [len(y)-1]
+        lims = [0] + lims + [len(y) - 1]
         lims_diff = np.diff(lims)
 
         return [(lims[idx], lims[idx + 1]) for idx in range(len(lims_diff))]
 
     @classmethod
     def _pred_to_discrete(cls, y: np.ndarray, t: np.ndarray) -> np.ndarray:
-
         assert y.shape == t.shape, "Shapes of predictions and time are not matching"
         assert y.ndim == 1 and t.ndim == 1, "Predictions and time has to be 1d"
         time = t - t[0]

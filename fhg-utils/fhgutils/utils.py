@@ -97,6 +97,7 @@ class TqdmLoggingHandler(logging.Handler):
     level
         Default log level.
     """
+
     def __init__(self, level=logging.NOTSET):
         super().__init__(level)
 
@@ -115,7 +116,7 @@ if len(logger.handlers) == 0:
     logger.setLevel(logging.INFO)
 
     # create formatter and add it to the handlers
-    formatter = logging.Formatter('[%(levelname)s] %(message)s')
+    formatter = logging.Formatter("[%(levelname)s] %(message)s")
 
     tqdm_handler = TqdmLoggingHandler()
     tqdm_handler.setFormatter(formatter)
@@ -123,7 +124,7 @@ if len(logger.handlers) == 0:
     logger.addHandler(tqdm_handler)
 
 
-def get_sampling_rate(t, kind='mean', unix=False, decimals=None, t_unit=None):
+def get_sampling_rate(t, kind="mean", unix=False, decimals=None, t_unit=None):
     """
     Sampling rate from time vector.
 
@@ -164,14 +165,14 @@ def get_sampling_rate(t, kind='mean', unix=False, decimals=None, t_unit=None):
 
         # convert time array to units of seconds if necessary
         if n_digits != n_digits_unix_in_seconds:
-            t /= 10**(n_digits - n_digits_unix_in_seconds)
+            t /= 10 ** (n_digits - n_digits_unix_in_seconds)
     else:
-        if t_unit == 's':
+        if t_unit == "s":
             factor = 1
-        elif t_unit == 'ms':
-            factor = 10 ** -3
-        elif t_unit == 'us':
-            factor = 10 ** -6
+        elif t_unit == "ms":
+            factor = 10**-3
+        elif t_unit == "us":
+            factor = 10**-6
         else:
             raise ValueError("Unknown unit " + str(t_unit) + " for time!")
 
@@ -218,17 +219,19 @@ def filter_ts_data(X, y=None, filt=None):
     if filt is not None:
         valid_keys = {key for key, _ in contextual_recarray_dtype}
         if not set(filt.keys()).issubset(valid_keys):
-            raise ValueError(f"Possible keys for filtering"
-                             f" are {valid_keys} but not {set(filt.keys()) - valid_keys}")
+            raise ValueError(
+                f"Possible keys for filtering"
+                f" are {valid_keys} but not {set(filt.keys()) - valid_keys}"
+            )
 
         indices = []
         for key, val in filt.items():
             if isinstance(val, (list, tuple, np.ndarray)):
                 indices_per_key = []
                 for v in val:
-                    indices_per_key.append(set(
-                        np.argwhere(Xc[key] == v).flatten().tolist()
-                    ))
+                    indices_per_key.append(
+                        set(np.argwhere(Xc[key] == v).flatten().tolist())
+                    )
                 indices.append(set.union(*indices_per_key))
             else:
                 indices.append(set(np.argwhere(Xc[key] == val).flatten().tolist()))
@@ -272,10 +275,13 @@ def find_nearest(a, targets):
     array([0, 1, 3])
     """
     targets = np.atleast_1d(targets)
-    indices = np.atleast_1d(np.searchsorted(a, targets, side="left")).astype('int')
+    indices = np.atleast_1d(np.searchsorted(a, targets, side="left")).astype("int")
 
     for i, idx in enumerate(indices):
-        if idx > 0 and (idx == len(a) or math.fabs(targets[i] - a[idx - 1]) < math.fabs(targets[i] - a[idx])):
+        if idx > 0 and (
+            idx == len(a)
+            or math.fabs(targets[i] - a[idx - 1]) < math.fabs(targets[i] - a[idx])
+        ):
             indices[i] = idx - 1
 
     if len(indices) == 1:
@@ -378,8 +384,10 @@ def proper_divs(n):
     pf = prime_factors(n)
     pfactors, occurrences = pf.keys(), pf.values()
     multiplicities = product(*(range(oc + 1) for oc in occurrences))
-    divs = {reduce(int.__mul__, (pf ** m for pf, m in zip(pfactors, multis)), 1)
-            for multis in multiplicities}
+    divs = {
+        reduce(int.__mul__, (pf**m for pf, m in zip(pfactors, multis)), 1)
+        for multis in multiplicities
+    }
     try:
         divs.remove(n)
     except KeyError:
@@ -437,7 +445,9 @@ def moving_window(sequence, window_size, step_size=None, incomplete=False):
     if not isinstance(sequence, collections.abc.Iterable):
         raise TypeError("Input sequence has to be an iterable")
 
-    if not isinstance(window_size, int) or (not isinstance(step_size, int) and step_size is not None):
+    if not isinstance(window_size, int) or (
+        not isinstance(step_size, int) and step_size is not None
+    ):
         raise TypeError("Window size and step size must be integers")
     elif step_size is None:
         step_size = window_size
@@ -453,7 +463,7 @@ def moving_window(sequence, window_size, step_size=None, incomplete=False):
 
     # windowing
     for i in range(0, num_chunks * step_size, step_size):
-        window = sequence[i:i + window_size]
+        window = sequence[i : i + window_size]
         if len(window) == window_size or (len(window) < window_size and incomplete):
             yield window
         else:
@@ -465,17 +475,17 @@ class SubsequentTransformer:
     _N_OBS = 2
 
     def __setattr__(self, key, value):
-        if key in ['n', 'nobs', 'nsdt', 't_unit'] and value is None:
-            if key in ['n', 'nsdt']:
+        if key in ["n", "nobs", "nsdt", "t_unit"] and value is None:
+            if key in ["n", "nsdt"]:
                 value = self._N_SDT
-            elif key == 'nobs':
+            elif key == "nobs":
                 value = self._N_OBS
-            elif key == 't_unit':
+            elif key == "t_unit":
                 value = self._T_UNIT
             else:
                 raise Exception("[CRITICAL] Should not happen.")
 
-        elif key in ['n', 'nobs', 'nsdt'] and value == 0:
+        elif key in ["n", "nobs", "nsdt"] and value == 0:
             raise ValueError(f"{key} must be greater than zero.")
 
         super().__setattr__(key, value)
@@ -483,10 +493,10 @@ class SubsequentTransformer:
 
 class BaseEstimator(sklearn.base.BaseEstimator):
     _VERBOSE = True
-    _T_UNIT = 's'
+    _T_UNIT = "s"
 
     def __setattr__(self, key, value):
-        if key == 't_unit' and value is None:
+        if key == "t_unit" and value is None:
             value = self._T_UNIT
         super().__setattr__(key, value)
 
@@ -527,10 +537,15 @@ class Segment(BaseEstimator, XyTransformerMixin, SubsequentTransformer):
         Xt = np.array(Xt)
 
         # check if 'n' is valid
-        if ((Xc is not None) and (np.unique(Xc.desc).size != self.n)) or \
-                (not isinstance(self.n, int)) or (N % self.n != 0):
+        if (
+            ((Xc is not None) and (np.unique(Xc.desc).size != self.n))
+            or (not isinstance(self.n, int))
+            or (N % self.n != 0)
+        ):
             n_suggestion = np.unique(Xc.desc).size if Xc is not None else proper_divs(N)
-            print(f"[WARNING] The value of 'n' ({self.n}) is suspicious. Should be {n_suggestion} most likely.")
+            print(
+                f"[WARNING] The value of 'n' ({self.n}) is suspicious. Should be {n_suggestion} most likely."
+            )
 
         self.reference_windows_ = []  # list of reference windows
         self.num_new_ts_ = 0  # number of new time series after transformation
@@ -541,8 +556,10 @@ class Segment(BaseEstimator, XyTransformerMixin, SubsequentTransformer):
             duration = stop - start
 
             if duration > (60 * 60):
-                print(f"[WARN] duration for reference time is quite high ({duration / 60 / 60:.2f}h)."
-                      f" Most likely the parameter 'n' is wrong.")
+                print(
+                    f"[WARN] duration for reference time is quite high ({duration / 60 / 60:.2f}h)."
+                    f" Most likely the parameter 'n' is wrong."
+                )
 
             if Xc is not None:
                 factor = 10 ** (abs(get_exponent(np.max(Xc[selection_idx].sr)) + 1))
@@ -551,10 +568,15 @@ class Segment(BaseEstimator, XyTransformerMixin, SubsequentTransformer):
             else:
                 factor = 1e5
 
-            divisors = np.array(list(proper_divs(round2int(self.window_length * factor)))) / factor
+            divisors = (
+                np.array(list(proper_divs(round2int(self.window_length * factor))))
+                / factor
+            )
 
             if Xc is not None:
-                precision = divisors[argnear(divisors, 1 / (np.max(Xc[selection_idx].sr) * 2))]
+                precision = divisors[
+                    argnear(divisors, 1 / (np.max(Xc[selection_idx].sr) * 2))
+                ]
             else:
                 precision = min(divisors)
 
@@ -572,18 +594,19 @@ class Segment(BaseEstimator, XyTransformerMixin, SubsequentTransformer):
                 sequence=t_ref,
                 window_size=window_size,
                 step_size=round2int(window_size * (1 - self.overlap)),
-                incomplete=False)
+                incomplete=False,
+            )
 
             # remove unused timestamps from reference windows
             win_ref = [(win[0], win[-1]) for win in wins]
 
             self.reference_windows_.append(win_ref)
-            self.num_new_ts_ += (len(win_ref) * self.n)
+            self.num_new_ts_ += len(win_ref) * self.n
 
         return self
 
     def transform(self, X, y, sample_weight=None):
-        check_is_fitted(self, ['reference_windows_', 'num_new_ts_'])
+        check_is_fitted(self, ["reference_windows_", "num_new_ts_"])
 
         Xt, Xc = get_ts_data_parts(X)
         yt = y
@@ -592,24 +615,33 @@ class Segment(BaseEstimator, XyTransformerMixin, SubsequentTransformer):
         # preallocate new time series data
         Xt_trans = [None] * self.num_new_ts_
         y_trans = [None] * self.num_new_ts_
-        Xc_trans = np.recarray(shape=(self.num_new_ts_,), dtype=contextual_recarray_dtype)
+        Xc_trans = np.recarray(
+            shape=(self.num_new_ts_,), dtype=contextual_recarray_dtype
+        )
 
         k = 0
-        pbar = tqdm(total=self.num_new_ts_, desc="Segment", disable=(not self._VERBOSE), file=sys.stdout)
+        pbar = tqdm(
+            total=self.num_new_ts_,
+            desc="Segment",
+            disable=(not self._VERBOSE),
+            file=sys.stdout,
+        )
 
         # get time series which should be segmented together
-        for window, selection_idx in zip(self.reference_windows_, moving_window(range(N), window_size=self.n)):
-
+        for window, selection_idx in zip(
+            self.reference_windows_, moving_window(range(N), window_size=self.n)
+        ):
             # get reference windows for segmentation
             for starting_timestamp, ending_timestamp in window:
-
                 # segment each time series
                 for idx in selection_idx:
                     ts = Xt[idx]
                     start_idx = find_nearest(ts[:, 0], starting_timestamp)
 
                     if self.enforce_size and Xc is not None:
-                        stop_idx = start_idx + round2int(self.window_length * Xc[idx].sr)
+                        stop_idx = start_idx + round2int(
+                            self.window_length * Xc[idx].sr
+                        )
                     else:
                         stop_idx = find_nearest(ts[:, 0], ending_timestamp)
 
@@ -626,7 +658,8 @@ class Segment(BaseEstimator, XyTransformerMixin, SubsequentTransformer):
 
                         if self.enforce_size:
                             stop_idx = start_idx + round2int(
-                                self.window_length * get_sampling_rate(yt[idx][:, 0], t_unit=self._T_UNIT)
+                                self.window_length
+                                * get_sampling_rate(yt[idx][:, 0], t_unit=self._T_UNIT)
                             )
                         else:
                             stop_idx = find_nearest(yt[idx][:, 0], ending_timestamp)
@@ -643,8 +676,9 @@ class Segment(BaseEstimator, XyTransformerMixin, SubsequentTransformer):
 
         pbar.close()
 
-        assert len([1 for ts, y in zip(Xt_trans, y_trans)
-                    if ts is None or y is None]) == 0, "[CRITICAL] Missing segments."
+        assert (
+            len([1 for ts, y in zip(Xt_trans, y_trans) if ts is None or y is None]) == 0
+        ), "[CRITICAL] Missing segments."
 
         # --- find empty windows and delete them ---
         empty_windows = []
@@ -665,8 +699,10 @@ class Segment(BaseEstimator, XyTransformerMixin, SubsequentTransformer):
         num_empty_windows = len(empty_windows)
 
         if num_empty_windows > 0:
-            logger.warning(f"[{self.__class__.__name__}] {num_empty_windows} windows could not be processed "
-                           f"and thus removed")
+            logger.warning(
+                f"[{self.__class__.__name__}] {num_empty_windows} windows could not be processed "
+                f"and thus removed"
+            )
 
         # --- finalize ---
         if Xc is not None:
@@ -675,5 +711,3 @@ class Segment(BaseEstimator, XyTransformerMixin, SubsequentTransformer):
             Xt = Xt_trans
 
         return Xt, y_trans, sample_weight
-
-
