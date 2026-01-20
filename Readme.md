@@ -50,7 +50,7 @@ License:
 
 # Use in Publications 
 
-- Löffler et al. (2022) "Don't Get Me Wrong: How to Apply Deep Visual Interpretations to Time Series" https://arxiv.org/abs/2203.07861
+- Löffler et al. (2025) "Don't Get Me Wrong: How to Apply Deep Visual Interpretations to Time Series" https://doi.org/10.1007/s10489-025-06798-3
 - Redzepagic et al. (2020) "A Sense of Quality for Augmented Reality Assisted Process Guidance" https://doi.org/10.1109/ISMAR-Adjunct51615.2020.00046
 - Mishra et al. (2020) "Recipes for Post-training Quantization
 of Deep Neural Networks" https://www.emc2-ai.org/assets/docs/virtual-20/emc2-virtual20-paper-8.pdf
